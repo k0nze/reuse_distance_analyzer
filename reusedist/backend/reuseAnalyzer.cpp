@@ -1,9 +1,11 @@
 #include "reuseAnalyzer.h"
+#include "acadl_instruction_generator.h"
 #include "cmath"
+#include "instruction.h"
+#include "set_associative_cache.h"
 #include "unordered_set"
 #include <fstream>
 #include <sstream>
-
 #define COMPULSORY_MISS -1
 #define EMPTY -100
 
@@ -41,6 +43,11 @@ reuseAnalyzer::reuseAnalyzer(int sets, int ways, int cacheLineSize,
     uniqueAccessesInBlock->push_back(m);
   }
 }
+
+reuseAnalyzer::reuseAnalyzer(const shared_ptr<SetAssociativeCache> &cache,
+                             int blockSize)
+    : reuseAnalyzer(cache->sets, cache->ways, cache->cache_line_size,
+                    blockSize) {}
 
 reuseAnalyzer::~reuseAnalyzer() {
   delete trace;
@@ -307,4 +314,23 @@ int32_t reuseAnalyzer::recordAccess(int32_t address) {
   trace->at(setID).push_back(address);
   t.at(setID) += 1;
   return reuseDist;
+}
+
+void reuseAnalyzer::analyzeInstructionGenerator(
+    const shared_ptr<ACADLInstructionGenerator> &instructionGenerator) {
+  for (int i = 0; i < instructionGenerator->getMaxIterations(); ++i) {
+    auto instructions = instructionGenerator->generate();
+    for (const auto &instruction : *instructions) {
+      if (!instruction->read_addresses.empty()) {
+        for (const auto &read_address : instruction->read_addresses) {
+          processLoad(read_address);
+        }
+      }
+      if (!instruction->write_addresses.empty()) {
+        for (const auto &write_address : instruction->write_addresses) {
+          processStore(write_address);
+        }
+      }
+    }
+  }
 }
