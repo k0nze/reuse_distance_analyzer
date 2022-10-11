@@ -1,6 +1,9 @@
+.venv/
+
 cmake-build-*/
 .idea/
 
+reusedist.egg-info/
 # C extensions
 *.so
 *.dylib
