@@ -72,6 +72,7 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={build_directory}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DPYBIND11_PYTHON_VERSION={sys.version_info.major}.{sys.version_info.minor}",
+            f"-DBUILD_ACADL=OFF", f"-DBUILD_ASWDL=OFF",
             f"-DMOVE_LIBREUSEDIST=ON",
             f"-DLIBREUSEDIST_OUTPUT_DIRECTORY={self.reusedist_backend_dir_path}/"
         ]
