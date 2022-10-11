@@ -3,6 +3,21 @@ project(reusedist)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(BUILD_ACADL
+    "ON"
+    CACHE
+      STRING
+      "whether acadl's shared library should be built or assumed to be already built and merely linked"
+)
+set(BUILD_ASWDL
+    "ON"
+    CACHE
+      STRING
+      "whether aswdl's shared library should be built or assumed to be already built and merely linked"
+)
+set(LIBREUSEDIST_OUTPUT_DIRECTORY
+    "${PROJECT_SOURCE_DIR}/reusedist/backend"
+    CACHE STRING "directory where reusedist.cpython file is to be moved")
 
 set(MOVE_LIBREUSEDIST
     "OFF"
@@ -17,6 +32,21 @@ set(BACKEND_SRC_DIR reusedist/backend)
 set(CMAKE_VERBOSE_MAKEFILE
     ON
     CACHE BOOL "ON")
+
+# set path to ACADL repository
+if(DEFINED ACADL_PATH)
+  message("ACADL_PATH set to command line parameter: ${ACADL_PATH}")
+else()
+  set(ACADL_PATH ${PROJECT_SOURCE_DIR}/../acadl)
+  message("ACADL_PATH set to default: ${ACADL_PATH}")
+endif()
+# set path to ASWDL repository
+if(DEFINED ASWDL_PATH)
+  message("ASWDL_PATH set to command line parameter: ${ASWDL_PATH}")
+else()
+  set(ASWDL_PATH ${PROJECT_SOURCE_DIR}/../aswdl)
+  message("ASWDL_PATH set to default: ${ASWDL_PATH}")
+endif()
 # check compiler versions
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   if(CXX_COMPILER_VERSION VERSION_LESS 9.0)
@@ -77,6 +107,62 @@ target_link_libraries(reusedist PRIVATE libreusedist)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   target_link_options(reusedist PRIVATE "-fuse-ld=gold")
 endif()
+
+# depending on if acadl /aswdl should be built or not, either the subdirectories
+# are added or merely linked to the .so
+if(BUILD_ACADL)
+  message("set to build acadl dependency for this project")
+  if(NOT TARGET acadl OR NOT TARGET libacadl)
+    message("adding acadl from reusedist")
+    add_subdirectory(${ACADL_PATH} ${ACADL_PATH}/acadl/backend/)
+  else()
+    message("not adding acadl from reusedist")
+  endif()
+  target_link_libraries(libreusedist PRIVATE libacadl)
+else()
+  message("set to find acadl dependency and just link it")
+  find_library(
+    LIBACADL
+    NAMES acadl
+    HINTS ${ACADL_PATH}/acadl/backend NO_CACHE)
+  message("acadl lib found at ${LIBACADL}")
+  target_link_libraries(libreusedist PRIVATE ${LIBACADL})
+endif()
+
+if(BUILD_ASWDL)
+  message("set to build aswdl dependency for this project")
+  if(NOT TARGET aswdl OR NOT TARGET libaswdlforreusedist)
+    message("adding aswdl from reusedist")
+    add_subdirectory(${ASWDL_PATH} ${ASWDL_PATH}/aswdl/backend/)
+  else()
+    message("aswdl not added from reusedist")
+  endif()
+  target_link_libraries(libreusedist PRIVATE libaswdl)
+else()
+  message("set to find aswdl dependency and just link it")
+  find_library(
+    LIBASWDL
+    NAMES aswdl
+    HINTS ${ASWDL_PATH}/aswdl/backend NO_CACHE)
+  message("aswdl lib found at ${LIBASWDL}")
+  target_link_libraries(libreusedist PRIVATE ${LIBASWDL})
+endif()
+
+# add include directories of ACADL dependencies
+target_include_directories(reusedist PRIVATE ${ACADL_PATH}/acadl/backend/)
+target_include_directories(reusedist PRIVATE ${ASWDL_PATH}/aswdl/backend/)
+target_include_directories(reusedist PRIVATE ${ACADL_PATH}/external/fmt/include)
+target_include_directories(reusedist
+                           PRIVATE ${ACADL_PATH}/external/json/include)
+target_include_directories(reusedist PRIVATE external/pycachesim)
+
+target_include_directories(libreusedist PRIVATE ${ACADL_PATH}/acadl/backend/)
+target_include_directories(libreusedist PRIVATE ${ASWDL_PATH}/aswdl/backend/)
+target_include_directories(libreusedist
+                           PRIVATE ${ACADL_PATH}/external/fmt/include)
+target_include_directories(libreusedist
+                           PRIVATE ${ACADL_PATH}/external/json/include)
+target_include_directories(libreusedist PRIVATE external/pycachesim)
 
 # move libreusedist into reusedist/backend
 if(MOVE_LIBREUSEDIST)
