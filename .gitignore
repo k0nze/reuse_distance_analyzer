@@ -1,0 +1,6 @@
+cmake-build-*/
+.idea/
+
+# C extensions
+*.so
+*.dylib

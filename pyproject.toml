@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=63.2.0", "wheel>=0.37.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reusedist"
+version = "1.0.0"
+description = "{}"
+readme = "README.md"
+authors = [
+    { name = "{}", email = "{}" }
+]
+license = { file = "LICENSE" }
+
+classifiers = [
+    "License :: OSI Approved :: {}",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+
+keywords = ["", "", ""]
+
+dependencies = [
+    ""
+]
+
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = ["yapf", "bumpver", "isort", "pip-tools", "unittest", "pre-commit"]
+
+[project.urls]
+Homepage = ""
+
+[tool.bumpver]
+current_version = "1.0.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+push = true
+
+[tool.bumpver.file_patterns]
+"src/reusedist/__init__.py" = ['__version__ = "{version}"',]
+"pyproject.toml" = ['current_version = "{version}"',]
+
+[tool.yapf]
+arithmetic_precedence_indication = "True"
+force_multiline_dict = "True"

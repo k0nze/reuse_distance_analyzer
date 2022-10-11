@@ -1,0 +1,11 @@
+
+#ifndef PYBIND_TEMPLATE_REUSEDIST_H
+#define PYBIND_TEMPLATE_REUSEDIST_H
+
+
+class reusedist {
+
+};
+
+
+#endif //PYBIND_TEMPLATE_REUSEDIST_H
