@@ -25,7 +25,7 @@ public:
   unordered_map<int32_t, int32_t> getReuseDistanceCounts();
 
   void analyzeAcaFile(const std::string &acaFilePath);
-  void analyzeInstructionGenerator(
+  vector<int> analyzeInstructionGenerator(
       const shared_ptr<ACADLInstructionGenerator> &instructionGenerator);
   void printDistanceCounts();
 

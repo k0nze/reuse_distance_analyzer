@@ -316,21 +316,29 @@ int32_t reuseAnalyzer::recordAccess(int32_t address) {
   return reuseDist;
 }
 
-void reuseAnalyzer::analyzeInstructionGenerator(
+vector<int> reuseAnalyzer::analyzeInstructionGenerator(
     const shared_ptr<ACADLInstructionGenerator> &instructionGenerator) {
+  vector<int> l1MissesByIteration;
   for (int i = 0; i < instructionGenerator->getMaxIterations(); ++i) {
     auto instructions = instructionGenerator->generate();
+    int l1Misses = 0;
     for (const auto &instruction : *instructions) {
       if (!instruction->read_addresses.empty()) {
         for (const auto &read_address : instruction->read_addresses) {
-          processLoad(read_address);
+          if (processLoad(read_address) >= ways) {
+            l1Misses++;
+          }
         }
       }
       if (!instruction->write_addresses.empty()) {
         for (const auto &write_address : instruction->write_addresses) {
-          processStore(write_address);
+          if (processStore(write_address) >= ways) {
+            l1Misses++;
+          }
         }
       }
     }
+    l1MissesByIteration.push_back(l1Misses);
   }
+  return l1MissesByIteration;
 }
