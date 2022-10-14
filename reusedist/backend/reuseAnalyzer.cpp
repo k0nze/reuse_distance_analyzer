@@ -319,20 +319,26 @@ int32_t reuseAnalyzer::recordAccess(int32_t address) {
 vector<int> reuseAnalyzer::analyzeInstructionGenerator(
     const shared_ptr<ACADLInstructionGenerator> &instructionGenerator) {
   vector<int> l1MissesByIteration;
+  std::unordered_set<int> uniqueAddresses;
+  int reuse_dist;
   for (int i = 0; i < instructionGenerator->getMaxIterations(); ++i) {
     auto instructions = instructionGenerator->generate();
     int l1Misses = 0;
     for (const auto &instruction : *instructions) {
       if (!instruction->read_addresses.empty()) {
         for (const auto &read_address : instruction->read_addresses) {
-          if (processLoad(read_address) >= ways) {
+            uniqueAddresses.insert(read_address);
+            reuse_dist = processLoad(read_address);
+          if (reuse_dist  == -1 or reuse_dist >= ways ) {
             l1Misses++;
           }
         }
       }
       if (!instruction->write_addresses.empty()) {
         for (const auto &write_address : instruction->write_addresses) {
-          if (processStore(write_address) >= ways) {
+            uniqueAddresses.insert(write_address);
+            reuse_dist = processStore(write_address);
+          if (reuse_dist  == -1 or reuse_dist >= ways) {
             l1Misses++;
           }
         }
@@ -340,5 +346,6 @@ vector<int> reuseAnalyzer::analyzeInstructionGenerator(
     }
     l1MissesByIteration.push_back(l1Misses);
   }
+    printf("had a total number of %lu unique addresses\n",uniqueAddresses.size());
   return l1MissesByIteration;
 }
