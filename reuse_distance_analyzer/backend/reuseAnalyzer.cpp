@@ -40,27 +40,9 @@ ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cacheLineSi
     }
 }
 
-/*
-reuseAnalyzer::reuseAnalyzer(const shared_ptr<SetAssociativeCache> &cache,
-                             int blockSize)
-    : reuseAnalyzer(cache->sets, cache->ways, cache->cache_line_size,
-                    blockSize) {}
+int32_t ReuseDistanceAnalyzer::process_load(uint32_t address) { return recordAccess(address); }
 
-reuseAnalyzer::~reuseAnalyzer() {
-  delete trace;
-  delete lastAccesses;
-  delete reuseDistances;
-  delete reuseDistanceCounts;
-  for (auto d : *uniqueAccessesInBlock) {
-    delete d;
-  }
-  delete uniqueAccessesInBlock;
-}
-*/
-
-int32_t ReuseDistanceAnalyzer::processLoad(int32_t address) { return recordAccess(address); }
-
-int32_t ReuseDistanceAnalyzer::processStore(int32_t address) { return recordAccess(address); }
+int32_t ReuseDistanceAnalyzer::process_store(uint32_t address) { return recordAccess(address); }
 
 unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::getReuseDistanceCounts() { return *reuseDistanceCounts; }
 
