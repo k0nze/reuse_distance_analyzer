@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "reuseAnalyzer.h"
+#include "reuse_distance_analyzer.h"
 
 int main() {
     std::cout << "Reuse Distance Analyzer" << std::endl;

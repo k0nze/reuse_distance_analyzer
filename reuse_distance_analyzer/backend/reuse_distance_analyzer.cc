@@ -1,12 +1,9 @@
-#include "reuseAnalyzer.h"
+#include "reuse_distance_analyzer.h"
 
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <unordered_set>
-//#include "acadl_instruction_generator.h"
-#include "cmath"
-//#include "instruction.h"
-//#include "set_associative_cache.h"
 
 #define COMPULSORY_MISS -1
 #define EMPTY -100

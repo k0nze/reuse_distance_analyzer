@@ -11,7 +11,7 @@ set(MOVE_LIB
     CACHE STRING "move TODO")
 
 add_library(reuse_distance_analyzer SHARED
-            reuse_distance_analyzer/backend/reuseAnalyzer.cpp)
+            reuse_distance_analyzer/backend/reuse_distance_analyzer.cc)
 
 if(MOVE_LIB)
     set_target_properties(
