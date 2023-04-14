@@ -187,7 +187,7 @@ void ReuseDistanceAnalyzer::compulsory_miss_block_update(int32_t set_id) {
     }
 }
 
-int32_t ReuseDistanceAnalyzer::block(int32_t lvl, int32_t i, int32_t setID) {
+int32_t ReuseDistanceAnalyzer::block(int32_t level, int32_t i, int32_t set_id) {
     /**
      * Manages the data structure, if the first acceess to (l,i) happens, a new
      * block is entered in the dict with the overhead of counting all the distinct
@@ -195,26 +195,26 @@ int32_t ReuseDistanceAnalyzer::block(int32_t lvl, int32_t i, int32_t setID) {
      * TODO instead of counting the trace, for block(l,i) just add all blocks
      * (l-1,i*B...i*B + B-1) does not appear to be that trivial
      */
-    if (lvl == 0) {
-        return (*trace).at(setID)[i] >= 0 ? 1 : 0;
+    if (level == 0) {
+        return (*trace).at(set_id)[i] >= 0 ? 1 : 0;
     } else {
-        auto blockDictOfSet = (*unique_accesses_in_block).at(setID);
-        auto got = (*blockDictOfSet).find(key(lvl, i));
-        if (got != (*blockDictOfSet).end()) {
+        auto block_dict_of_set = (*unique_accesses_in_block).at(set_id);
+        auto got = (*block_dict_of_set).find(key(level, i));
+        if (got != (*block_dict_of_set).end()) {
             return got->second;
 
         } else {
             // TODO fix types
-            unsigned int lowerBound = pow(block_size, lvl) * i;
-            unsigned int upperBound = pow(block_size, lvl) * (i + 1);
-            upperBound = upperBound < (*trace).at(setID).size() ? upperBound : (*trace).at(setID).size();
-            int elems = 0;
-            for (unsigned int j = lowerBound; j < upperBound; ++j) {
-                if ((*trace).at(setID)[j] >= 0) {
-                    ++elems;
+            unsigned int lower_bound = pow(block_size, level) * i;
+            unsigned int upper_bound = pow(block_size, level) * (i + 1);
+            upper_bound = upper_bound < (*trace).at(set_id).size() ? upper_bound : (*trace).at(set_id).size();
+            int num_elements = 0;
+            for (unsigned int j = lower_bound; j < upper_bound; ++j) {
+                if ((*trace).at(set_id)[j] >= 0) {
+                    ++num_elements;
                 }
             }
-            return elems;
+            return num_elements;
         }
     }
 }

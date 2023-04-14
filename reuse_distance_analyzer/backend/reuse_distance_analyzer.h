@@ -58,7 +58,7 @@ private:
 
     void compulsory_miss_block_update(int32_t set_id);
 
-    int32_t block(int32_t lvl, int32_t i, int32_t setID);
+    int32_t block(int32_t level, int32_t i, int32_t set_id);
 
     int32_t recordAccess(int32_t address);
 };
