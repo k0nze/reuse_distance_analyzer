@@ -10,7 +10,7 @@ using std::vector, std::unordered_map, std::shared_ptr;
 
 class ReuseDistanceAnalyzer {
 public:
-    ReuseDistanceAnalyzer(int sets, int ways, int cacheLineSize, int blockSize = 16);
+    ReuseDistanceAnalyzer(int sets, int ways, int cache_line_size, int block_size = 16);
 
     int32_t process_load(uint32_t address);
 

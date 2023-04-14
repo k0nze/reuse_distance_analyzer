@@ -12,18 +12,18 @@ inline u_int64_t key(int i, int j) { return (u_int64_t)i << 32 | (unsigned int)j
 
 inline std::pair<int, int> dekey(u_int64_t key) { return std::pair<int, int>{key >> 32, (int)key}; };
 
-ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cacheLineSize, int blockSize) {
+ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cache_line_size, int block_size) {
     // TODO assert sets,ways,cachelinesize is power of 2
     this->sets = sets;
-    this->cacheLineSize = cacheLineSize;
+    this->cacheLineSize = cache_line_size;
     this->ways = ways;
 
     this->setsMask = sets - 1;
     this->cacheLineShiftOffset = 0;
-    while (cacheLineSize >>= 1) ++cacheLineShiftOffset;
+    while (cache_line_size >>= 1) ++cacheLineShiftOffset;
 
     t = vector<int32_t>(sets, 0);
-    B = blockSize;
+    B = block_size;
     trace = new vector<vector<int32_t>>(sets, vector<int32_t>());
     lastAccesses = new unordered_map<int32_t, int32_t>();
     reuseDistances = new vector<int32_t>();
