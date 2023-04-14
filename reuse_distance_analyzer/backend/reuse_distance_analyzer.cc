@@ -15,7 +15,7 @@ inline std::pair<int, int> dekey(u_int64_t key) { return std::pair<int, int>{key
 
 inline bool is_power_of_two(int n) { return n && !(n & (n - 1)); }
 
-ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cache_line_size, int block_size) {
+ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(uint32_t sets, uint32_t ways, uint32_t cache_line_size, uint32_t block_size) {
     assert(sets > 0 && is_power_of_two(sets));
     assert(ways > 0 && is_power_of_two(ways));
     assert(cache_line_size > 0 && is_power_of_two(cache_line_size));
@@ -30,8 +30,8 @@ ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cache_line_
 
     this->t = vector<int32_t>(sets, 0);
     this->block_size = block_size;
-    this->trace = new vector<vector<int32_t>>(sets, vector<int32_t>());
-    this->last_accesses = new unordered_map<int32_t, int32_t>();
+    this->trace = new vector<vector<address_t>>(sets, vector<address_t>());
+    this->last_accesses = new unordered_map<address_t, int32_t>();
     this->reuse_distances = new vector<int32_t>();
     this->reuse_distance_counts = new unordered_map<int32_t, int32_t>();
 
@@ -43,9 +43,9 @@ ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cache_line_
     }
 }
 
-int32_t ReuseDistanceAnalyzer::process_load(uint32_t address) { return record_access(address); }
+int32_t ReuseDistanceAnalyzer::process_load(address_t address) { return record_access(address); }
 
-int32_t ReuseDistanceAnalyzer::process_store(uint32_t address) { return record_access(address); }
+int32_t ReuseDistanceAnalyzer::process_store(address_t address) { return record_access(address); }
 
 unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::get_reuse_distance_counts() { return *reuse_distance_counts; }
 
@@ -219,7 +219,7 @@ int32_t ReuseDistanceAnalyzer::block(int32_t level, int32_t i, int32_t set_id) {
     }
 }
 
-int32_t ReuseDistanceAnalyzer::record_access(int32_t address) {
+int32_t ReuseDistanceAnalyzer::record_access(address_t address) {
     /**
      * Retrieve the last access time, then determine the distance between the last
      * access and now
@@ -240,5 +240,6 @@ int32_t ReuseDistanceAnalyzer::record_access(int32_t address) {
     record_reuse_distance(reuse_distance);
     trace->at(set_id).push_back(address);
     t.at(set_id) += 1;
+
     return reuse_distance;
 }

@@ -8,27 +8,29 @@
 
 using std::vector, std::unordered_map, std::shared_ptr;
 
+typedef uint64_t address_t;
+
 class ReuseDistanceAnalyzer {
 public:
-    ReuseDistanceAnalyzer(int sets, int ways, int cache_line_size, int block_size = 16);
+    ReuseDistanceAnalyzer(uint32_t sets, uint32_t ways, uint32_t cache_line_size, uint32_t block_size = 16);
 
-    int32_t process_load(uint32_t address);
+    int32_t process_load(address_t address);
 
-    int32_t process_store(uint32_t address);
+    int32_t process_store(address_t address);
 
     unordered_map<int32_t, int32_t> get_reuse_distance_counts();
 
 private:
     // list of address accesses per set
-    vector<vector<int32_t>>* trace;
+    vector<vector<address_t>>* trace;
 
     // list of reuse distances
     vector<int32_t>* reuse_distances;
 
-    // given a address, receive timing when address was last accessed,
+    // given an address, receive timing when address was last accessed,
     // if address was not accessed yet, it gets timing -1. However negative values
     // are never stored here
-    unordered_map<int32_t, int32_t>* last_accesses;
+    unordered_map<address_t, int32_t>* last_accesses;
 
     // maps reuse distance (-1 if compulsory miss, else real distance) to
     // occurency count
@@ -38,13 +40,14 @@ private:
     // that is a composite of 2 32 bit values (lvl,i). Every set has an own b-tree
     vector<unordered_map<u_int64_t, int32_t>*>* unique_accesses_in_block;
 
-    int block_size;
-    vector<int32_t> t;
-    int sets;
+    uint32_t sets;
+    uint32_t ways;
+    uint32_t cache_line_size;
+    uint32_t block_size;
     int32_t cache_line_shift_offset;
     int32_t sets_mask;
-    int ways;
-    int cache_line_size;
+
+    vector<int32_t> t;
 
     int32_t get_set_id(int32_t address) const;
 
@@ -60,7 +63,7 @@ private:
 
     int32_t block(int32_t level, int32_t i, int32_t set_id);
 
-    int32_t record_access(int32_t address);
+    int32_t record_access(address_t address);
 };
 
 #endif  // REUSE_DISTANCE_ANALYZER_H
