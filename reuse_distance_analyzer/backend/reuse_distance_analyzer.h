@@ -60,7 +60,7 @@ private:
 
     int32_t block(int32_t level, int32_t i, int32_t set_id);
 
-    int32_t recordAccess(int32_t address);
+    int32_t record_access(int32_t address);
 };
 
 #endif  // REUSE_DISTANCE_ANALYZER_H

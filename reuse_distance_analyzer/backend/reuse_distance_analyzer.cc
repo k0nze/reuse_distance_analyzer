@@ -43,9 +43,9 @@ ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cache_line_
     }
 }
 
-int32_t ReuseDistanceAnalyzer::process_load(uint32_t address) { return recordAccess(address); }
+int32_t ReuseDistanceAnalyzer::process_load(uint32_t address) { return record_access(address); }
 
-int32_t ReuseDistanceAnalyzer::process_store(uint32_t address) { return recordAccess(address); }
+int32_t ReuseDistanceAnalyzer::process_store(uint32_t address) { return record_access(address); }
 
 unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::get_reuse_distance_counts() { return *reuse_distance_counts; }
 
@@ -122,7 +122,7 @@ int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, int32_t se
 }
 
 vector<int32_t> ReuseDistanceAnalyzer::create_iter_range(int32_t start, int32_t stop) const {
-    /***
+    /**
     * Creates the "i" for the block(lvl,i) calls in the following two lines (stored in s (stored in s) (stored in s) (stored in
     s))
     * reuse_distance=reuse_distance+block (lv l,t1 +1) +... +block( lvl ,(t1 /B+ 1)*B -1)
@@ -132,7 +132,7 @@ vector<int32_t> ReuseDistanceAnalyzer::create_iter_range(int32_t start, int32_t 
 
     int32_t lower, upper;  // lower is inclusive, upper exclusive
 
-    /*
+    /**
      * if both 'start' and 'stop' are in the same block ('start'/B == 'stop'/B)
      * issues arise with the corresponding both loops: then upper of first loop
      * could be greater than 'stop', and lower of second loop could be lower than
@@ -219,26 +219,26 @@ int32_t ReuseDistanceAnalyzer::block(int32_t level, int32_t i, int32_t set_id) {
     }
 }
 
-int32_t ReuseDistanceAnalyzer::recordAccess(int32_t address) {
-    /***
+int32_t ReuseDistanceAnalyzer::record_access(int32_t address) {
+    /**
      * Retrieve the last access time, then determine the distance between the last
      * access and now
      */
-    int32_t lastAccess;
-    int32_t reuseDist;
-    int32_t setID;
+    int32_t last_access;
+    int32_t reuse_distance;
+    int32_t set_id;
     address >>= cache_line_shift_offset;
     auto got = (*last_accesses).find(address);
     if (got != (*last_accesses).end()) {
-        lastAccess = got->second;
+        last_access = got->second;
     } else {
-        lastAccess = -1;
+        last_access = -1;
     }
-    setID = get_set_id(address);
-    reuseDist = measure_reuse_distance(lastAccess, setID);
-    (*last_accesses).insert_or_assign(address, t.at(setID));
-    record_reuse_distance(reuseDist);
-    trace->at(setID).push_back(address);
-    t.at(setID) += 1;
-    return reuseDist;
+    set_id = get_set_id(address);
+    reuse_distance = measure_reuse_distance(last_access, set_id);
+    (*last_accesses).insert_or_assign(address, t.at(set_id));
+    record_reuse_distance(reuse_distance);
+    trace->at(set_id).push_back(address);
+    t.at(set_id) += 1;
+    return reuse_distance;
 }
