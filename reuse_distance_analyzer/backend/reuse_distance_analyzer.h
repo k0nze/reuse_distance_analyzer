@@ -54,7 +54,7 @@ private:
 
     int32_t count_distinct_elements(int32_t start, int32_t set_id);
 
-    vector<int32_t> createIterRange(int32_t start, int32_t stop) const;
+    vector<int32_t> create_iter_range(int32_t start, int32_t stop) const;
 
     void compulsoryMissBlockUpdate(int32_t setID);
 

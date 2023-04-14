@@ -90,7 +90,7 @@ int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, int32_t se
     int32_t lvl = 0;
 
     while (start != stop) {
-        auto s = createIterRange(start, stop);
+        auto s = create_iter_range(start, stop);
         for (auto i : s) {
             reuse_distance += block(lvl, i, set_id);
         }
@@ -121,20 +121,24 @@ int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, int32_t se
     return reuse_distance;
 }
 
-vector<int32_t> ReuseDistanceAnalyzer::createIterRange(int32_t start, int32_t stop) const {
+vector<int32_t> ReuseDistanceAnalyzer::create_iter_range(int32_t start, int32_t stop) const {
     /***
-    * Creates the "i" for the block(lvl,i) calls in the following two lines
-    * reuseDis=reuseDis+block (lv l,t1 +1) +... +block( lvl ,(t1 /B+ 1)*B -1)
-      reuseDis=reuseDis+block (lv l,(t 2/B )*B) +.. .+block (lvl ,t2 -1)
+    * Creates the "i" for the block(lvl,i) calls in the following two lines (stored in s (stored in s) (stored in s) (stored in
+    s))
+    * reuse_distance=reuse_distance+block (lv l,t1 +1) +... +block( lvl ,(t1 /B+ 1)*B -1)
+      reuse_distance=reuse_distance+block (lv l,(t 2/B )*B) +.. .+block (lvl ,t2 -1)
     */
     auto s = std::vector<int32_t>();
 
     int32_t lower, upper;  // lower is inclusive, upper exclusive
-    // if both 'start' and 'stop' are in the same block ('start'/B == 'stop'/B)
-    // issues arise with the corresponding both loops: then upper of first loop
-    // could be greater than 'stop', and lower of second loop could be lower than
-    // 'start'. Thus, it is simpler to just do one loop over ['start' +1,'stop')
-    // and directly return, otherwise no lower/upper checks necessary
+
+    /*
+     * if both 'start' and 'stop' are in the same block ('start'/B == 'stop'/B)
+     * issues arise with the corresponding both loops: then upper of first loop
+     * could be greater than 'stop', and lower of second loop could be lower than
+     * 'start'. Thus, it is simpler to just do one loop over ['start' +1,'stop')
+     * and directly return, otherwise no lower/upper checks necessary
+     */
     if (start / block_size == stop / block_size) {
         for (int32_t i = start + 1; i < stop; ++i) {
             s.push_back(i);
@@ -148,6 +152,7 @@ vector<int32_t> ReuseDistanceAnalyzer::createIterRange(int32_t start, int32_t st
     for (int32_t i = lower; i < upper; ++i) {
         s.push_back(i);
     }
+
     // Second loop according to the second line
     lower = ((stop / block_size) * block_size);
     upper = stop;
