@@ -14,8 +14,9 @@ add_library(reuse_distance_analyzer SHARED
             reuse_distance_analyzer/backend/reuseAnalyzer.cpp)
 
 if(MOVE_LIB)
-  set_target_properties(reuse_distance_analyzer
-                        PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BACKEND_DIR_PATH})
+    set_target_properties(
+        reuse_distance_analyzer PROPERTIES LIBRARY_OUTPUT_DIRECTORY
+                                           ${BACKEND_DIR_PATH})
 endif()
 
 add_executable(tests_cpp tests/cpp/main.cc)
