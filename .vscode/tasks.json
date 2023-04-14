@@ -1,0 +1,32 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "create build dir",
+			"type": "shell",
+			"command": "mkdir -p build",
+			"problemMatcher": []
+		},
+		{
+			"label": "run cmake",
+			"type": "shell",
+			"command": "cd build; cmake -GNinja ..",
+			"problemMatcher": []
+		},
+		{
+			"label": "run ninja",
+			"type": "shell",
+			"command": "cd build; ninja",
+			"problemMatcher": []
+		},
+		{
+			"label": "run executable",
+			"type": "shell",
+			"command": "cd build; ./tests_cpp",
+			"dependsOn": ["run ninja"],
+			"problemMatcher": []
+		}
+	]
+}

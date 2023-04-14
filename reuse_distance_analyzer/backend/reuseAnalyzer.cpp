@@ -1,11 +1,13 @@
-#include "reuseAnalyzer.h"
-#include "acadl_instruction_generator.h"
-#include "cmath"
-#include "instruction.h"
-#include "set_associative_cache.h"
-#include "unordered_set"
 #include <fstream>
 #include <sstream>
+#include <unordered_set>
+
+#include "reuseAnalyzer.h"
+//#include "acadl_instruction_generator.h"
+#include "cmath"
+//#include "instruction.h"
+//#include "set_associative_cache.h"
+
 #define COMPULSORY_MISS -1
 #define EMPTY -100
 
@@ -44,6 +46,7 @@ reuseAnalyzer::reuseAnalyzer(int sets, int ways, int cacheLineSize,
   }
 }
 
+/*
 reuseAnalyzer::reuseAnalyzer(const shared_ptr<SetAssociativeCache> &cache,
                              int blockSize)
     : reuseAnalyzer(cache->sets, cache->ways, cache->cache_line_size,
@@ -59,6 +62,7 @@ reuseAnalyzer::~reuseAnalyzer() {
   }
   delete uniqueAccessesInBlock;
 }
+*/
 
 int32_t reuseAnalyzer::processLoad(int32_t address) {
   return recordAccess(address);
@@ -72,6 +76,7 @@ unordered_map<int32_t, int32_t> reuseAnalyzer::getReuseDistanceCounts() {
   return *reuseDistanceCounts;
 }
 
+/*
 vector<std::string> split(const std::string &s, char delim) {
   vector<std::string> result;
   std::stringstream ss(s);
@@ -115,7 +120,7 @@ void reuseAnalyzer::printDistanceCounts() {
   for (auto i : *reuseDistanceCounts)
     printf("reuse distance: %i - count: %i\n", i.first, i.second);
 }
-
+*/
 int32_t reuseAnalyzer::getSetId(int32_t address) const {
   return (address)&setsMask;
 }
@@ -198,10 +203,10 @@ int32_t reuseAnalyzer::countDistinctElements(int32_t start, int32_t setID) {
 vector<int32_t> reuseAnalyzer::createIterRange(int32_t start,
                                                int32_t stop) const {
   /***
-   * Creates the "i" for the block(lvl,i) calls in the following two lines
-   * reuseDis=reuseDis+block (lv l,t1 +1) +... +block( lvl ,(t1 /B+ 1)*B -1)
-     reuseDis=reuseDis+block (lv l,(t 2/B )*B) +.. .+block (lvl ,t2 -1)
-   */
+  * Creates the "i" for the block(lvl,i) calls in the following two lines
+  * reuseDis=reuseDis+block (lv l,t1 +1) +... +block( lvl ,(t1 /B+ 1)*B -1)
+    reuseDis=reuseDis+block (lv l,(t 2/B )*B) +.. .+block (lvl ,t2 -1)
+  */
   auto s = std::vector<int32_t>();
 
   int32_t lower, upper; // lower is inclusive, upper exclusive
@@ -316,36 +321,38 @@ int32_t reuseAnalyzer::recordAccess(int32_t address) {
   return reuseDist;
 }
 
-vector<int> reuseAnalyzer::analyzeInstructionGenerator(
-    const shared_ptr<ACADLInstructionGenerator> &instructionGenerator) {
-  vector<int> l1MissesByIteration;
-  std::unordered_set<int> uniqueAddresses;
-  int reuse_dist;
-  for (int i = 0; i < instructionGenerator->getMaxIterations(); ++i) {
-    auto instructions = instructionGenerator->generate();
-    int l1Misses = 0;
-    for (const auto &instruction : *instructions) {
-      if (!instruction->read_addresses.empty()) {
-        for (const auto &read_address : instruction->read_addresses) {
-            uniqueAddresses.insert(read_address);
-            reuse_dist = processLoad(read_address);
-          if (reuse_dist  == -1 or reuse_dist >= ways ) {
-            l1Misses++;
-          }
-        }
-      }
-      if (!instruction->write_addresses.empty()) {
-        for (const auto &write_address : instruction->write_addresses) {
-            uniqueAddresses.insert(write_address);
-            reuse_dist = processStore(write_address);
-          if (reuse_dist  == -1 or reuse_dist >= ways) {
-            l1Misses++;
-          }
-        }
-      }
-    }
-    l1MissesByIteration.push_back(l1Misses);
-  }
-    printf("had a total number of %lu unique addresses\n",uniqueAddresses.size());
-  return l1MissesByIteration;
-}
+// vector<int> reuseAnalyzer::analyzeInstructionGenerator(
+//     const shared_ptr<ACADLInstructionGenerator> &instructionGenerator) {
+//   vector<int> l1MissesByIteration;
+//   std::unordered_set<int> uniqueAddresses;
+//   int reuse_dist;
+//   for (int i = 0; i < instructionGenerator->getMaxIterations(); ++i) {
+//     auto instructions = instructionGenerator->generate();
+//     int l1Misses = 0;
+//     for (const auto &instruction : *instructions) {
+//       if (!instruction->read_addresses.empty()) {
+//         for (const auto &read_address : instruction->read_addresses) {
+//             uniqueAddresses.insert(read_address);
+//             reuse_dist = processLoad(read_address);
+//           if (reuse_dist  == -1 or reuse_dist >= ways ) {
+//             l1Misses++;
+//           }
+//         }
+//       }
+//       if (!instruction->write_addresses.empty()) {
+//         for (const auto &write_address : instruction->write_addresses) {
+//             uniqueAddresses.insert(write_address);
+//             reuse_dist = processStore(write_address);
+//           if (reuse_dist  == -1 or reuse_dist >= ways) {
+//             l1Misses++;
+//           }
+//         }
+//       }
+//     }
+//     l1MissesByIteration.push_back(l1Misses);
+//   }
+//     printf("had a total number of %lu unique
+//     addresses\n",uniqueAddresses.size());
+//   return l1MissesByIteration;
+// }
+//*/

@@ -14,9 +14,11 @@ class reuseAnalyzer {
 
 public:
   reuseAnalyzer(int sets, int ways, int cacheLineSize, int blockSize = 16);
+  /*
   explicit reuseAnalyzer(const std::shared_ptr<SetAssociativeCache> &cache,
                          int blockSize = 16);
   ~reuseAnalyzer();
+  */
 
   int32_t processLoad(int32_t address);
 
@@ -24,10 +26,12 @@ public:
 
   unordered_map<int32_t, int32_t> getReuseDistanceCounts();
 
+  /*
   void analyzeAcaFile(const std::string &acaFilePath);
   vector<int> analyzeInstructionGenerator(
       const shared_ptr<ACADLInstructionGenerator> &instructionGenerator);
   void printDistanceCounts();
+  */
 
 private:
   // list of address accesses per set
