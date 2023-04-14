@@ -56,7 +56,7 @@ int32_t ReuseDistanceAnalyzer::measure_reuse_distance(int32_t last_access, int32
         compulsoryMissBlockUpdate(set_id);
         return COMPULSORY_MISS;
     } else {
-        return countDistinctElements(last_access, set_id);
+        return count_distinct_elements(last_access, set_id);
     }
 }
 
@@ -70,12 +70,10 @@ void ReuseDistanceAnalyzer::record_reuse_distance(int32_t reuse_distance) {
     (*reuse_distances).push_back(reuse_distance);
 }
 
-void ReuseDistanceAnalyzer::sanityCheckBlockDict() {}
-
-int32_t ReuseDistanceAnalyzer::countDistinctElements(int32_t start, int32_t setID) {
+int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, int32_t set_id) {
     /**
      * instead of counting each distinct element between t1 and t2, a b-tree is
-     * used: example: t1 = 77, t2 = 213, B = 10 instead of checking between 87 and
+     * used: example: t1 = 77, t2 = 213, block_size = 10 instead of checking between 87 and
      * 213 for each entry if an access is there we can check 78,79 then the block
      * [80-89] ~ block(1,8) and block [90-99] ~ block (1,9) then block [100-199] ~
      * block(2,1) and finally block [200-210] ~ block(1,20) with 211,212 NOTE: the
@@ -85,16 +83,16 @@ int32_t ReuseDistanceAnalyzer::countDistinctElements(int32_t start, int32_t setI
      * the next block is reached: in case of B = 10, first the ones at level 0,
      * then the tens at level 1, the hundreds at level 2 ...
      */
-    int32_t stop = t.at(setID);
+    int32_t stop = t.at(set_id);
     int32_t stop_cp = stop;
     int32_t start_cp = start;
-    int32_t reuseDist = 0;
+    int32_t reuse_distance = 0;
     int32_t lvl = 0;
 
     while (start != stop) {
         auto s = createIterRange(start, stop);
         for (auto i : s) {
-            reuseDist += block(lvl, i, setID);
+            reuse_distance += block(lvl, i, set_id);
         }
         start /= block_size;
         stop /= block_size;
@@ -104,7 +102,7 @@ int32_t ReuseDistanceAnalyzer::countDistinctElements(int32_t start, int32_t setI
     /**
      * afterwards the b-tree structure needs to be updated (all the blocks that
      * contain 'start') need to be decremented (because every new access to
-     * countDistinctElements will count the lastAccess at 'stop', not the
+     * count_distinct_elements will count the last_access at 'stop', not the
      * duplicate at 'start') while every block that contains 'stop' need to be
      * incremented
      */
@@ -115,12 +113,12 @@ int32_t ReuseDistanceAnalyzer::countDistinctElements(int32_t start, int32_t setI
     while (start / block_size != stop / block_size) {
         start /= block_size;
         stop /= block_size;
-        (*(*unique_accesses_in_block).at(setID))[key(lvl + 1, start)] = block(lvl + 1, start, setID) - 1;
-        (*(*unique_accesses_in_block).at(setID))[key(lvl + 1, stop)] = block(lvl + 1, stop, setID) + 1;
+        (*(*unique_accesses_in_block).at(set_id))[key(lvl + 1, start)] = block(lvl + 1, start, set_id) - 1;
+        (*(*unique_accesses_in_block).at(set_id))[key(lvl + 1, stop)] = block(lvl + 1, stop, set_id) + 1;
         lvl++;
     }
-    (*trace).at(setID)[start_cp] = EMPTY;
-    return reuseDist;
+    (*trace).at(set_id)[start_cp] = EMPTY;
+    return reuse_distance;
 }
 
 vector<int32_t> ReuseDistanceAnalyzer::createIterRange(int32_t start, int32_t stop) const {

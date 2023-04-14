@@ -52,9 +52,7 @@ private:
 
     void record_reuse_distance(int32_t reuse_distance);
 
-    void sanityCheckBlockDict();
-
-    int32_t countDistinctElements(int32_t start, int32_t setID);
+    int32_t count_distinct_elements(int32_t start, int32_t set_id);
 
     vector<int32_t> createIterRange(int32_t start, int32_t stop) const;
 
