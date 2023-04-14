@@ -48,7 +48,7 @@ private:
 
     int32_t get_set_id(int32_t address) const;
 
-    int32_t measureReuseDistance(int32_t lastAccess, int32_t setID);
+    int32_t measure_reuse_distance(int32_t last_access, int32_t set_id);
 
     void recordReuseDistance(int32_t reuseDistance);
 

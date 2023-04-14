@@ -51,12 +51,12 @@ unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::get_reuse_distance_counts
 
 int32_t ReuseDistanceAnalyzer::get_set_id(int32_t address) const { return (address)&sets_mask; }
 
-int32_t ReuseDistanceAnalyzer::measureReuseDistance(int32_t lastAccess, int32_t setID) {
-    if (lastAccess == COMPULSORY_MISS) {
-        compulsoryMissBlockUpdate(setID);
+int32_t ReuseDistanceAnalyzer::measure_reuse_distance(int32_t last_access, int32_t set_id) {
+    if (last_access == COMPULSORY_MISS) {
+        compulsoryMissBlockUpdate(set_id);
         return COMPULSORY_MISS;
     } else {
-        return countDistinctElements(lastAccess, setID);
+        return countDistinctElements(last_access, set_id);
     }
 }
 
@@ -231,7 +231,7 @@ int32_t ReuseDistanceAnalyzer::recordAccess(int32_t address) {
         lastAccess = -1;
     }
     setID = get_set_id(address);
-    reuseDist = measureReuseDistance(lastAccess, setID);
+    reuseDist = measure_reuse_distance(lastAccess, setID);
     (*last_accesses).insert_or_assign(address, t.at(setID));
     recordReuseDistance(reuseDist);
     trace->at(setID).push_back(address);
