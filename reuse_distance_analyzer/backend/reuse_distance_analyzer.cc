@@ -53,7 +53,7 @@ int32_t ReuseDistanceAnalyzer::get_set_id(int32_t address) const { return (addre
 
 int32_t ReuseDistanceAnalyzer::measure_reuse_distance(int32_t last_access, int32_t set_id) {
     if (last_access == COMPULSORY_MISS) {
-        compulsoryMissBlockUpdate(set_id);
+        compulsory_miss_block_update(set_id);
         return COMPULSORY_MISS;
     } else {
         return count_distinct_elements(last_access, set_id);
@@ -163,21 +163,22 @@ vector<int32_t> ReuseDistanceAnalyzer::create_iter_range(int32_t start, int32_t 
     return s;
 }
 
-void ReuseDistanceAnalyzer::compulsoryMissBlockUpdate(int32_t setID) {
+void ReuseDistanceAnalyzer::compulsory_miss_block_update(int32_t set_id) {
     /**
      * a compulsory miss means that there does not exists a previous access to the
      * current address. this leads to no counting of distinct elements and thus no
      * updating of the block data structure So just increment all the blocks that
      * contain i
      */
-    int32_t t_ = t.at(setID);
+    int32_t t_ = t.at(set_id);
     int lvl = 0;
     if (block_size < 2) {
         return;
     }
+
     for (;;) {
         t_ /= block_size;
-        (*(*unique_accesses_in_block).at(setID))[key(lvl + 1, t_)] = block(lvl + 1, t_, setID) + 1;
+        (*(*unique_accesses_in_block).at(set_id))[key(lvl + 1, t_)] = block(lvl + 1, t_, set_id) + 1;
         lvl++;
         if (t_ == 0) {
             // block(l,0) will never be accessed, can stop
@@ -241,39 +242,3 @@ int32_t ReuseDistanceAnalyzer::recordAccess(int32_t address) {
     t.at(setID) += 1;
     return reuseDist;
 }
-
-// vector<int> reuseAnalyzer::analyzeInstructionGenerator(
-//     const shared_ptr<ACADLInstructionGenerator> &instructionGenerator) {
-//   vector<int> l1MissesByIteration;
-//   std::unordered_set<int> uniqueAddresses;
-//   int reuse_dist;
-//   for (int i = 0; i < instructionGenerator->getMaxIterations(); ++i) {
-//     auto instructions = instructionGenerator->generate();
-//     int l1Misses = 0;
-//     for (const auto &instruction : *instructions) {
-//       if (!instruction->read_addresses.empty()) {
-//         for (const auto &read_address : instruction->read_addresses) {
-//             uniqueAddresses.insert(read_address);
-//             reuse_dist = processLoad(read_address);
-//           if (reuse_dist  == -1 or reuse_dist >= ways ) {
-//             l1Misses++;
-//           }
-//         }
-//       }
-//       if (!instruction->write_addresses.empty()) {
-//         for (const auto &write_address : instruction->write_addresses) {
-//             uniqueAddresses.insert(write_address);
-//             reuse_dist = processStore(write_address);
-//           if (reuse_dist  == -1 or reuse_dist >= ways) {
-//             l1Misses++;
-//           }
-//         }
-//       }
-//     }
-//     l1MissesByIteration.push_back(l1Misses);
-//   }
-//     printf("had a total number of %lu unique
-//     addresses\n",uniqueAddresses.size());
-//   return l1MissesByIteration;
-// }
-//*/

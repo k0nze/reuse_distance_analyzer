@@ -56,7 +56,7 @@ private:
 
     vector<int32_t> create_iter_range(int32_t start, int32_t stop) const;
 
-    void compulsoryMissBlockUpdate(int32_t setID);
+    void compulsory_miss_block_update(int32_t set_id);
 
     int32_t block(int32_t lvl, int32_t i, int32_t setID);
 
