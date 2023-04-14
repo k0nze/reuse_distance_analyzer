@@ -1,9 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "acadl_instruction_generator.h"
-#include "reuseAnalyzer.h"
-#include "set_associative_cache.h"
+#include "reuse_distance_analyzer.h"
 
 namespace py = pybind11;
 
