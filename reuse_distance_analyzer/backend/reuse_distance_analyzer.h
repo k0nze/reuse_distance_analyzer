@@ -50,7 +50,7 @@ private:
 
     int32_t measure_reuse_distance(int32_t last_access, int32_t set_id);
 
-    void recordReuseDistance(int32_t reuseDistance);
+    void record_reuse_distance(int32_t reuse_distance);
 
     void sanityCheckBlockDict();
 

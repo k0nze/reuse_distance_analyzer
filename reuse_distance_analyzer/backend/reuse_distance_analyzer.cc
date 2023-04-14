@@ -60,14 +60,14 @@ int32_t ReuseDistanceAnalyzer::measure_reuse_distance(int32_t last_access, int32
     }
 }
 
-void ReuseDistanceAnalyzer::recordReuseDistance(int32_t reuseDistance) {
-    auto got = (*reuse_distance_counts).find(reuseDistance);
+void ReuseDistanceAnalyzer::record_reuse_distance(int32_t reuse_distance) {
+    auto got = (*reuse_distance_counts).find(reuse_distance);
     if (got != (*reuse_distance_counts).end()) {
-        (*reuse_distance_counts)[reuseDistance] += 1;
+        (*reuse_distance_counts)[reuse_distance] += 1;
     } else {
-        (*reuse_distance_counts)[reuseDistance] = 1;
+        (*reuse_distance_counts)[reuse_distance] = 1;
     }
-    (*reuse_distances).push_back(reuseDistance);
+    (*reuse_distances).push_back(reuse_distance);
 }
 
 void ReuseDistanceAnalyzer::sanityCheckBlockDict() {}
@@ -233,7 +233,7 @@ int32_t ReuseDistanceAnalyzer::recordAccess(int32_t address) {
     setID = get_set_id(address);
     reuseDist = measure_reuse_distance(lastAccess, setID);
     (*last_accesses).insert_or_assign(address, t.at(setID));
-    recordReuseDistance(reuseDist);
+    record_reuse_distance(reuseDist);
     trace->at(setID).push_back(address);
     t.at(setID) += 1;
     return reuseDist;
