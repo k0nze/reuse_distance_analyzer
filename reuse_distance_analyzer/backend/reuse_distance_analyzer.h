@@ -42,11 +42,11 @@ private:
     vector<int32_t> t;
     int sets;
     int32_t cache_line_shift_offset;
-    int32_t setsMask;
+    int32_t sets_mask;
     int ways;
     int cache_line_size;
 
-    int32_t getSetId(int32_t address) const;
+    int32_t get_set_id(int32_t address) const;
 
     int32_t measureReuseDistance(int32_t lastAccess, int32_t setID);
 

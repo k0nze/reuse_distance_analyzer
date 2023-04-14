@@ -24,7 +24,7 @@ ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cache_line_
     this->cache_line_size = cache_line_size;
     this->ways = ways;
 
-    this->setsMask = sets - 1;
+    this->sets_mask = sets - 1;
     this->cache_line_shift_offset = 0;
     while (cache_line_size >>= 1) ++cache_line_shift_offset;
 
@@ -49,7 +49,7 @@ int32_t ReuseDistanceAnalyzer::process_store(uint32_t address) { return recordAc
 
 unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::get_reuse_distance_counts() { return *reuse_distance_counts; }
 
-int32_t ReuseDistanceAnalyzer::getSetId(int32_t address) const { return (address)&setsMask; }
+int32_t ReuseDistanceAnalyzer::get_set_id(int32_t address) const { return (address)&sets_mask; }
 
 int32_t ReuseDistanceAnalyzer::measureReuseDistance(int32_t lastAccess, int32_t setID) {
     if (lastAccess == COMPULSORY_MISS) {
@@ -230,7 +230,7 @@ int32_t ReuseDistanceAnalyzer::recordAccess(int32_t address) {
     } else {
         lastAccess = -1;
     }
-    setID = getSetId(address);
+    setID = get_set_id(address);
     reuseDist = measureReuseDistance(lastAccess, setID);
     (*last_accesses).insert_or_assign(address, t.at(setID));
     recordReuseDistance(reuseDist);
