@@ -13,27 +13,27 @@ inline u_int64_t key(int i, int j) { return (u_int64_t)i << 32 | (unsigned int)j
 inline std::pair<int, int> dekey(u_int64_t key) { return std::pair<int, int>{key >> 32, (int)key}; };
 
 ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cache_line_size, int block_size) {
-    // TODO assert sets,ways,cachelinesize is power of 2
+    // TODO assert sets, ways, cache_line_size is power of 2
     this->sets = sets;
-    this->cacheLineSize = cache_line_size;
+    this->cache_line_size = cache_line_size;
     this->ways = ways;
 
     this->setsMask = sets - 1;
-    this->cacheLineShiftOffset = 0;
-    while (cache_line_size >>= 1) ++cacheLineShiftOffset;
+    this->cache_line_shift_offset = 0;
+    while (cache_line_size >>= 1) ++cache_line_shift_offset;
 
-    t = vector<int32_t>(sets, 0);
-    B = block_size;
-    trace = new vector<vector<int32_t>>(sets, vector<int32_t>());
-    lastAccesses = new unordered_map<int32_t, int32_t>();
-    reuseDistances = new vector<int32_t>();
-    reuseDistanceCounts = new unordered_map<int32_t, int32_t>();
+    this->t = vector<int32_t>(sets, 0);
+    this->block_size = block_size;
+    this->trace = new vector<vector<int32_t>>(sets, vector<int32_t>());
+    this->last_accesses = new unordered_map<int32_t, int32_t>();
+    this->reuse_distances = new vector<int32_t>();
+    this->reuse_distance_counts = new unordered_map<int32_t, int32_t>();
 
-    uniqueAccessesInBlock = new vector<unordered_map<u_int64_t, int32_t>*>();
+    this->unique_accesses_in_block = new vector<unordered_map<u_int64_t, int32_t>*>();
 
-    for (int i = 0; i < sets; ++i) {
+    for (int i = 0; i < this->sets; ++i) {
         auto m = new unordered_map<u_int64_t, int32_t>();
-        uniqueAccessesInBlock->push_back(m);
+        this->unique_accesses_in_block->push_back(m);
     }
 }
 
@@ -41,7 +41,7 @@ int32_t ReuseDistanceAnalyzer::process_load(uint32_t address) { return recordAcc
 
 int32_t ReuseDistanceAnalyzer::process_store(uint32_t address) { return recordAccess(address); }
 
-unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::getReuseDistanceCounts() { return *reuseDistanceCounts; }
+unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::getReuseDistanceCounts() { return *reuse_distance_counts; }
 
 /*
 vector<std::string> split(const std::string &s, char delim) {
@@ -100,13 +100,13 @@ int32_t ReuseDistanceAnalyzer::measureReuseDistance(int32_t lastAccess, int32_t 
 }
 
 void ReuseDistanceAnalyzer::recordReuseDistance(int32_t reuseDistance) {
-    auto got = (*reuseDistanceCounts).find(reuseDistance);
-    if (got != (*reuseDistanceCounts).end()) {
-        (*reuseDistanceCounts)[reuseDistance] += 1;
+    auto got = (*reuse_distance_counts).find(reuseDistance);
+    if (got != (*reuse_distance_counts).end()) {
+        (*reuse_distance_counts)[reuseDistance] += 1;
     } else {
-        (*reuseDistanceCounts)[reuseDistance] = 1;
+        (*reuse_distance_counts)[reuseDistance] = 1;
     }
-    (*reuseDistances).push_back(reuseDistance);
+    (*reuse_distances).push_back(reuseDistance);
 }
 
 void ReuseDistanceAnalyzer::sanityCheckBlockDict() {}
@@ -135,8 +135,8 @@ int32_t ReuseDistanceAnalyzer::countDistinctElements(int32_t start, int32_t setI
         for (auto i : s) {
             reuseDist += block(lvl, i, setID);
         }
-        start /= B;
-        stop /= B;
+        start /= block_size;
+        stop /= block_size;
         lvl++;
     }
 
@@ -151,11 +151,11 @@ int32_t ReuseDistanceAnalyzer::countDistinctElements(int32_t start, int32_t setI
     stop = stop_cp;
 
     lvl = 0;
-    while (start / B != stop / B) {
-        start /= B;
-        stop /= B;
-        (*(*uniqueAccessesInBlock).at(setID))[key(lvl + 1, start)] = block(lvl + 1, start, setID) - 1;
-        (*(*uniqueAccessesInBlock).at(setID))[key(lvl + 1, stop)] = block(lvl + 1, stop, setID) + 1;
+    while (start / block_size != stop / block_size) {
+        start /= block_size;
+        stop /= block_size;
+        (*(*unique_accesses_in_block).at(setID))[key(lvl + 1, start)] = block(lvl + 1, start, setID) - 1;
+        (*(*unique_accesses_in_block).at(setID))[key(lvl + 1, stop)] = block(lvl + 1, stop, setID) + 1;
         lvl++;
     }
     (*trace).at(setID)[start_cp] = EMPTY;
@@ -176,7 +176,7 @@ vector<int32_t> ReuseDistanceAnalyzer::createIterRange(int32_t start, int32_t st
     // could be greater than 'stop', and lower of second loop could be lower than
     // 'start'. Thus, it is simpler to just do one loop over ['start' +1,'stop')
     // and directly return, otherwise no lower/upper checks necessary
-    if (start / B == stop / B) {
+    if (start / block_size == stop / block_size) {
         for (int32_t i = start + 1; i < stop; ++i) {
             s.push_back(i);
         }
@@ -185,12 +185,12 @@ vector<int32_t> ReuseDistanceAnalyzer::createIterRange(int32_t start, int32_t st
     // First loop replicating the "i" of the first line
 
     lower = start + 1;
-    upper = ((start / B + 1) * B);  // (start /B+ 1)*B -1
+    upper = ((start / block_size + 1) * block_size);  // (start /B+ 1)*B -1
     for (int32_t i = lower; i < upper; ++i) {
         s.push_back(i);
     }
     // Second loop according to the second line
-    lower = ((stop / B) * B);
+    lower = ((stop / block_size) * block_size);
     upper = stop;
     for (int32_t i = lower; i < upper; ++i) {
         s.push_back(i);
@@ -208,12 +208,12 @@ void ReuseDistanceAnalyzer::compulsoryMissBlockUpdate(int32_t setID) {
      */
     int32_t t_ = t.at(setID);
     int lvl = 0;
-    if (B < 2) {
+    if (block_size < 2) {
         return;
     }
     for (;;) {
-        t_ /= B;
-        (*(*uniqueAccessesInBlock).at(setID))[key(lvl + 1, t_)] = block(lvl + 1, t_, setID) + 1;
+        t_ /= block_size;
+        (*(*unique_accesses_in_block).at(setID))[key(lvl + 1, t_)] = block(lvl + 1, t_, setID) + 1;
         lvl++;
         if (t_ == 0) {
             // block(l,0) will never be accessed, can stop
@@ -233,15 +233,15 @@ int32_t ReuseDistanceAnalyzer::block(int32_t lvl, int32_t i, int32_t setID) {
     if (lvl == 0) {
         return (*trace).at(setID)[i] >= 0 ? 1 : 0;
     } else {
-        auto blockDictOfSet = (*uniqueAccessesInBlock).at(setID);
+        auto blockDictOfSet = (*unique_accesses_in_block).at(setID);
         auto got = (*blockDictOfSet).find(key(lvl, i));
         if (got != (*blockDictOfSet).end()) {
             return got->second;
 
         } else {
             // TODO fix types
-            unsigned int lowerBound = pow(B, lvl) * i;
-            unsigned int upperBound = pow(B, lvl) * (i + 1);
+            unsigned int lowerBound = pow(block_size, lvl) * i;
+            unsigned int upperBound = pow(block_size, lvl) * (i + 1);
             upperBound = upperBound < (*trace).at(setID).size() ? upperBound : (*trace).at(setID).size();
             int elems = 0;
             for (unsigned int j = lowerBound; j < upperBound; ++j) {
@@ -262,16 +262,16 @@ int32_t ReuseDistanceAnalyzer::recordAccess(int32_t address) {
     int32_t lastAccess;
     int32_t reuseDist;
     int32_t setID;
-    address >>= cacheLineShiftOffset;
-    auto got = (*lastAccesses).find(address);
-    if (got != (*lastAccesses).end()) {
+    address >>= cache_line_shift_offset;
+    auto got = (*last_accesses).find(address);
+    if (got != (*last_accesses).end()) {
         lastAccess = got->second;
     } else {
         lastAccess = -1;
     }
     setID = getSetId(address);
     reuseDist = measureReuseDistance(lastAccess, setID);
-    (*lastAccesses).insert_or_assign(address, t.at(setID));
+    (*last_accesses).insert_or_assign(address, t.at(setID));
     recordReuseDistance(reuseDist);
     trace->at(setID).push_back(address);
     t.at(setID) += 1;

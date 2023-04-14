@@ -23,28 +23,28 @@ private:
     vector<vector<int32_t>>* trace;
 
     // list of reuse distances
-    vector<int32_t>* reuseDistances;
+    vector<int32_t>* reuse_distances;
 
     // given a address, receive timing when address was last accessed,
     // if address was not accessed yet, it gets timing -1. However negative values
     // are never stored here
-    unordered_map<int32_t, int32_t>* lastAccesses;
+    unordered_map<int32_t, int32_t>* last_accesses;
 
     // maps reuse distance (-1 if compulsory miss, else real distance) to
     // occurency count
-    unordered_map<int32_t, int32_t>* reuseDistanceCounts;
+    unordered_map<int32_t, int32_t>* reuse_distance_counts;
 
     // the b-tree data structure for reducing the complexity. key is a 64 bit int,
     // that is a composite of 2 32 bit values (lvl,i). Every set has an own b-tree
-    vector<unordered_map<u_int64_t, int32_t>*>* uniqueAccessesInBlock;
+    vector<unordered_map<u_int64_t, int32_t>*>* unique_accesses_in_block;
 
-    int B;
+    int block_size;
     vector<int32_t> t;
     int sets;
-    int32_t cacheLineShiftOffset;
+    int32_t cache_line_shift_offset;
     int32_t setsMask;
     int ways;
-    int cacheLineSize;
+    int cache_line_size;
 
     int32_t getSetId(int32_t address) const;
 
