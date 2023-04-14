@@ -47,53 +47,8 @@ int32_t ReuseDistanceAnalyzer::process_load(uint32_t address) { return recordAcc
 
 int32_t ReuseDistanceAnalyzer::process_store(uint32_t address) { return recordAccess(address); }
 
-unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::getReuseDistanceCounts() { return *reuse_distance_counts; }
+unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::get_reuse_distance_counts() { return *reuse_distance_counts; }
 
-/*
-vector<std::string> split(const std::string &s, char delim) {
-  vector<std::string> result;
-  std::stringstream ss(s);
-  std::string item;
-
-  while (getline(ss, item, delim)) {
-    result.push_back(item);
-  }
-
-  return result;
-}
-
-void reuseAnalyzer::analyzeAcaFile(const std::string &acaFilePath) {
-  std::string line;
-
-  std::ifstream is(acaFilePath);
-
-  auto addrs = std::unordered_set<int>();
-  while (getline(is, line)) {
-    auto splits = split(line, ' ');
-
-    if (splits[2] == "1") {
-      // load
-      int addr = stoi(splits[splits.size() - 1], nullptr, 16);
-      addrs.insert(addr);
-      processLoad(addr);
-    }
-    if (splits[2] == "2") {
-      // store
-      int addr = stoi(splits[splits.size() - 1], nullptr, 16);
-      addrs.insert(addr);
-      processStore(addr);
-    }
-  }
-  for (auto a : addrs) {
-    printf("%i\n", a);
-  }
-}
-
-void reuseAnalyzer::printDistanceCounts() {
-  for (auto i : *reuseDistanceCounts)
-    printf("reuse distance: %i - count: %i\n", i.first, i.second);
-}
-*/
 int32_t ReuseDistanceAnalyzer::getSetId(int32_t address) const { return (address)&setsMask; }
 
 int32_t ReuseDistanceAnalyzer::measureReuseDistance(int32_t lastAccess, int32_t setID) {

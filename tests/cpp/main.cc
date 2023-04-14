@@ -19,7 +19,7 @@ int main() {
     ra.process_store(16);
     ra.process_load(32);
 
-    auto counts = ra.getReuseDistanceCounts();
+    auto counts = ra.get_reuse_distance_counts();
 
     for (auto& kv : counts) {
         std::cout << kv.first << ", " << kv.second << std::endl;

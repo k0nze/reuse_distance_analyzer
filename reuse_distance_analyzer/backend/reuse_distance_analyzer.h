@@ -16,7 +16,7 @@ public:
 
     int32_t process_store(uint32_t address);
 
-    unordered_map<int32_t, int32_t> getReuseDistanceCounts();
+    unordered_map<int32_t, int32_t> get_reuse_distance_counts();
 
 private:
     // list of address accesses per set
