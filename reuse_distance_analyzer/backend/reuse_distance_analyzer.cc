@@ -1,5 +1,6 @@
 #include "reuse_distance_analyzer.h"
 
+#include <cassert>
 #include <cmath>
 #include <fstream>
 #include <sstream>
@@ -10,10 +11,15 @@
 
 inline u_int64_t key(int i, int j) { return (u_int64_t)i << 32 | (unsigned int)j; }
 
-inline std::pair<int, int> dekey(u_int64_t key) { return std::pair<int, int>{key >> 32, (int)key}; };
+inline std::pair<int, int> dekey(u_int64_t key) { return std::pair<int, int>{key >> 32, (int)key}; }
+
+inline bool is_power_of_two(int n) { return n && !(n & (n - 1)); }
 
 ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cache_line_size, int block_size) {
-    // TODO assert sets, ways, cache_line_size is power of 2
+    assert(sets > 0 && is_power_of_two(sets));
+    assert(ways > 0 && is_power_of_two(ways));
+    assert(cache_line_size > 0 && is_power_of_two(cache_line_size));
+
     this->sets = sets;
     this->cache_line_size = cache_line_size;
     this->ways = ways;
