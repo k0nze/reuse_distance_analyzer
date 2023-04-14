@@ -1,37 +1,22 @@
-#ifndef REUSEDISTV2_REUSEANALYZER_H
-#define REUSEDISTV2_REUSEANALYZER_H
+#ifndef REUSE_DISTANCE_ANALYZER_H
+#define REUSE_DISTANCE_ANALYZER_H
 
 #include <cstdlib>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
-#include "memory"
-#include "unordered_map"
-#include "vector"
 using std::vector, std::unordered_map, std::shared_ptr;
 
-// Forward Declarations
-class SetAssociativeCache;
-class ACADLInstructionGenerator;
-class reuseAnalyzer {
+class ReuseDistanceAnalyzer {
 public:
-    reuseAnalyzer(int sets, int ways, int cacheLineSize, int blockSize = 16);
-    /*
-    explicit reuseAnalyzer(const std::shared_ptr<SetAssociativeCache> &cache,
-                           int blockSize = 16);
-    ~reuseAnalyzer();
-    */
+    ReuseDistanceAnalyzer(int sets, int ways, int cacheLineSize, int blockSize = 16);
 
     int32_t processLoad(int32_t address);
 
     int32_t processStore(int32_t address);
 
     unordered_map<int32_t, int32_t> getReuseDistanceCounts();
-
-    /*
-    void analyzeAcaFile(const std::string &acaFilePath);
-    vector<int> analyzeInstructionGenerator(
-        const shared_ptr<ACADLInstructionGenerator> &instructionGenerator);
-    void printDistanceCounts();
-    */
 
 private:
     // list of address accesses per set

@@ -15,7 +15,7 @@ inline u_int64_t key(int i, int j) { return (u_int64_t)i << 32 | (unsigned int)j
 
 inline std::pair<int, int> dekey(u_int64_t key) { return std::pair<int, int>{key >> 32, (int)key}; };
 
-reuseAnalyzer::reuseAnalyzer(int sets, int ways, int cacheLineSize, int blockSize) {
+ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(int sets, int ways, int cacheLineSize, int blockSize) {
     // TODO assert sets,ways,cachelinesize is power of 2
     this->sets = sets;
     this->cacheLineSize = cacheLineSize;
@@ -58,11 +58,11 @@ reuseAnalyzer::~reuseAnalyzer() {
 }
 */
 
-int32_t reuseAnalyzer::processLoad(int32_t address) { return recordAccess(address); }
+int32_t ReuseDistanceAnalyzer::processLoad(int32_t address) { return recordAccess(address); }
 
-int32_t reuseAnalyzer::processStore(int32_t address) { return recordAccess(address); }
+int32_t ReuseDistanceAnalyzer::processStore(int32_t address) { return recordAccess(address); }
 
-unordered_map<int32_t, int32_t> reuseAnalyzer::getReuseDistanceCounts() { return *reuseDistanceCounts; }
+unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::getReuseDistanceCounts() { return *reuseDistanceCounts; }
 
 /*
 vector<std::string> split(const std::string &s, char delim) {
@@ -109,9 +109,9 @@ void reuseAnalyzer::printDistanceCounts() {
     printf("reuse distance: %i - count: %i\n", i.first, i.second);
 }
 */
-int32_t reuseAnalyzer::getSetId(int32_t address) const { return (address)&setsMask; }
+int32_t ReuseDistanceAnalyzer::getSetId(int32_t address) const { return (address)&setsMask; }
 
-int32_t reuseAnalyzer::measureReuseDistance(int32_t lastAccess, int32_t setID) {
+int32_t ReuseDistanceAnalyzer::measureReuseDistance(int32_t lastAccess, int32_t setID) {
     if (lastAccess == COMPULSORY_MISS) {
         compulsoryMissBlockUpdate(setID);
         return COMPULSORY_MISS;
@@ -120,7 +120,7 @@ int32_t reuseAnalyzer::measureReuseDistance(int32_t lastAccess, int32_t setID) {
     }
 }
 
-void reuseAnalyzer::recordReuseDistance(int32_t reuseDistance) {
+void ReuseDistanceAnalyzer::recordReuseDistance(int32_t reuseDistance) {
     auto got = (*reuseDistanceCounts).find(reuseDistance);
     if (got != (*reuseDistanceCounts).end()) {
         (*reuseDistanceCounts)[reuseDistance] += 1;
@@ -130,9 +130,9 @@ void reuseAnalyzer::recordReuseDistance(int32_t reuseDistance) {
     (*reuseDistances).push_back(reuseDistance);
 }
 
-void reuseAnalyzer::sanityCheckBlockDict() {}
+void ReuseDistanceAnalyzer::sanityCheckBlockDict() {}
 
-int32_t reuseAnalyzer::countDistinctElements(int32_t start, int32_t setID) {
+int32_t ReuseDistanceAnalyzer::countDistinctElements(int32_t start, int32_t setID) {
     /**
      * instead of counting each distinct element between t1 and t2, a b-tree is
      * used: example: t1 = 77, t2 = 213, B = 10 instead of checking between 87 and
@@ -183,7 +183,7 @@ int32_t reuseAnalyzer::countDistinctElements(int32_t start, int32_t setID) {
     return reuseDist;
 }
 
-vector<int32_t> reuseAnalyzer::createIterRange(int32_t start, int32_t stop) const {
+vector<int32_t> ReuseDistanceAnalyzer::createIterRange(int32_t start, int32_t stop) const {
     /***
     * Creates the "i" for the block(lvl,i) calls in the following two lines
     * reuseDis=reuseDis+block (lv l,t1 +1) +... +block( lvl ,(t1 /B+ 1)*B -1)
@@ -220,7 +220,7 @@ vector<int32_t> reuseAnalyzer::createIterRange(int32_t start, int32_t stop) cons
     return s;
 }
 
-void reuseAnalyzer::compulsoryMissBlockUpdate(int32_t setID) {
+void ReuseDistanceAnalyzer::compulsoryMissBlockUpdate(int32_t setID) {
     /**
      * a compulsory miss means that there does not exists a previous access to the
      * current address. this leads to no counting of distinct elements and thus no
@@ -243,7 +243,7 @@ void reuseAnalyzer::compulsoryMissBlockUpdate(int32_t setID) {
     }
 }
 
-int32_t reuseAnalyzer::block(int32_t lvl, int32_t i, int32_t setID) {
+int32_t ReuseDistanceAnalyzer::block(int32_t lvl, int32_t i, int32_t setID) {
     /**
      * Manages the data structure, if the first acceess to (l,i) happens, a new
      * block is entered in the dict with the overhead of counting all the distinct
@@ -275,7 +275,7 @@ int32_t reuseAnalyzer::block(int32_t lvl, int32_t i, int32_t setID) {
     }
 }
 
-int32_t reuseAnalyzer::recordAccess(int32_t address) {
+int32_t ReuseDistanceAnalyzer::recordAccess(int32_t address) {
     /***
      * Retrieve the last access time, then determine the distance between the last
      * access and now
