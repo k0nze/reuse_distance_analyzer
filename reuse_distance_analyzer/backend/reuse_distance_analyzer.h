@@ -38,7 +38,7 @@ private:
 
     // the b-tree data structure for reducing the complexity. key is a 64 bit int,
     // that is a composite of 2 32 bit values (lvl,i). Every set has an own b-tree
-    vector<unordered_map<u_int64_t, int32_t>*>* unique_accesses_in_block;
+    vector<unordered_map<uint64_t, int32_t>*>* unique_accesses_in_block;
 
     uint32_t sets;
     uint32_t ways;
@@ -49,19 +49,19 @@ private:
 
     vector<int32_t> t;
 
-    int32_t get_set_id(int32_t address) const;
+    uint32_t get_set_id(address_t address) const;
 
     int32_t measure_reuse_distance(int32_t last_access, int32_t set_id);
 
     void record_reuse_distance(int32_t reuse_distance);
 
-    int32_t count_distinct_elements(int32_t start, int32_t set_id);
+    int32_t count_distinct_elements(int32_t start, uint32_t set_id);
 
     vector<int32_t> create_iter_range(int32_t start, int32_t stop) const;
 
-    void compulsory_miss_block_update(int32_t set_id);
+    void compulsory_miss_block_update(uint32_t set_id);
 
-    int32_t block(int32_t level, int32_t i, int32_t set_id);
+    int32_t block(int32_t level, int32_t i, uint32_t set_id);
 
     int32_t record_access(address_t address);
 };

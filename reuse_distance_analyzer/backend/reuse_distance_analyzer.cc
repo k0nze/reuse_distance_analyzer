@@ -9,7 +9,7 @@
 #define COMPULSORY_MISS -1
 #define EMPTY -100
 
-inline u_int64_t key(int i, int j) { return (u_int64_t)i << 32 | (unsigned int)j; }
+inline uint64_t key(int i, int j) { return (uint64_t)i << 32 | (unsigned int)j; }
 
 inline std::pair<int, int> dekey(u_int64_t key) { return std::pair<int, int>{key >> 32, (int)key}; }
 
@@ -35,7 +35,7 @@ ReuseDistanceAnalyzer::ReuseDistanceAnalyzer(uint32_t sets, uint32_t ways, uint3
     this->reuse_distances = new vector<int32_t>();
     this->reuse_distance_counts = new unordered_map<int32_t, int32_t>();
 
-    this->unique_accesses_in_block = new vector<unordered_map<u_int64_t, int32_t>*>();
+    this->unique_accesses_in_block = new vector<unordered_map<uint64_t, int32_t>*>();
 
     for (int i = 0; i < this->sets; ++i) {
         auto m = new unordered_map<u_int64_t, int32_t>();
@@ -49,7 +49,7 @@ int32_t ReuseDistanceAnalyzer::process_store(address_t address) { return record_
 
 unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::get_reuse_distance_counts() { return *reuse_distance_counts; }
 
-int32_t ReuseDistanceAnalyzer::get_set_id(int32_t address) const { return (address)&sets_mask; }
+uint32_t ReuseDistanceAnalyzer::get_set_id(address_t address) const { return (address)&sets_mask; }
 
 int32_t ReuseDistanceAnalyzer::measure_reuse_distance(int32_t last_access, int32_t set_id) {
     if (last_access == COMPULSORY_MISS) {
@@ -70,7 +70,7 @@ void ReuseDistanceAnalyzer::record_reuse_distance(int32_t reuse_distance) {
     (*reuse_distances).push_back(reuse_distance);
 }
 
-int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, int32_t set_id) {
+int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, uint32_t set_id) {
     /**
      * instead of counting each distinct element between t1 and t2, a b-tree is
      * used: example: t1 = 77, t2 = 213, block_size = 10 instead of checking between 87 and
@@ -87,16 +87,16 @@ int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, int32_t se
     int32_t stop_cp = stop;
     int32_t start_cp = start;
     int32_t reuse_distance = 0;
-    int32_t lvl = 0;
+    int32_t level = 0;
 
     while (start != stop) {
         auto s = create_iter_range(start, stop);
         for (auto i : s) {
-            reuse_distance += block(lvl, i, set_id);
+            reuse_distance += block(level, i, set_id);
         }
         start /= block_size;
         stop /= block_size;
-        lvl++;
+        level++;
     }
 
     /**
@@ -109,13 +109,13 @@ int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, int32_t se
     start = start_cp;
     stop = stop_cp;
 
-    lvl = 0;
+    level = 0;
     while (start / block_size != stop / block_size) {
         start /= block_size;
         stop /= block_size;
-        (*(*unique_accesses_in_block).at(set_id))[key(lvl + 1, start)] = block(lvl + 1, start, set_id) - 1;
-        (*(*unique_accesses_in_block).at(set_id))[key(lvl + 1, stop)] = block(lvl + 1, stop, set_id) + 1;
-        lvl++;
+        (*(*unique_accesses_in_block).at(set_id))[key(level + 1, start)] = block(level + 1, start, set_id) - 1;
+        (*(*unique_accesses_in_block).at(set_id))[key(level + 1, stop)] = block(level + 1, stop, set_id) + 1;
+        level++;
     }
     (*trace).at(set_id)[start_cp] = EMPTY;
     return reuse_distance;
@@ -123,11 +123,10 @@ int32_t ReuseDistanceAnalyzer::count_distinct_elements(int32_t start, int32_t se
 
 vector<int32_t> ReuseDistanceAnalyzer::create_iter_range(int32_t start, int32_t stop) const {
     /**
-    * Creates the "i" for the block(lvl,i) calls in the following two lines (stored in s (stored in s) (stored in s) (stored in
-    s))
-    * reuse_distance=reuse_distance+block (lv l,t1 +1) +... +block( lvl ,(t1 /B+ 1)*B -1)
-      reuse_distance=reuse_distance+block (lv l,(t 2/B )*B) +.. .+block (lvl ,t2 -1)
-    */
+     * Creates the "i" for the block(lvl,i) calls in the following two lines (stored in s)
+     * reuse_distance=reuse_distance+block (lv l,t1 +1) +... +block( lvl ,(t1 /B+ 1)*B -1)
+     * reuse_distance=reuse_distance+block (lv l,(t 2/B )*B) +.. .+block (lvl ,t2 -1)
+     */
     auto s = std::vector<int32_t>();
 
     int32_t lower, upper;  // lower is inclusive, upper exclusive
@@ -163,7 +162,7 @@ vector<int32_t> ReuseDistanceAnalyzer::create_iter_range(int32_t start, int32_t 
     return s;
 }
 
-void ReuseDistanceAnalyzer::compulsory_miss_block_update(int32_t set_id) {
+void ReuseDistanceAnalyzer::compulsory_miss_block_update(uint32_t set_id) {
     /**
      * a compulsory miss means that there does not exists a previous access to the
      * current address. this leads to no counting of distinct elements and thus no
@@ -171,7 +170,7 @@ void ReuseDistanceAnalyzer::compulsory_miss_block_update(int32_t set_id) {
      * contain i
      */
     int32_t t_ = t.at(set_id);
-    int lvl = 0;
+    int32_t lvl = 0;
     if (block_size < 2) {
         return;
     }
@@ -187,7 +186,7 @@ void ReuseDistanceAnalyzer::compulsory_miss_block_update(int32_t set_id) {
     }
 }
 
-int32_t ReuseDistanceAnalyzer::block(int32_t level, int32_t i, int32_t set_id) {
+int32_t ReuseDistanceAnalyzer::block(int32_t level, int32_t i, uint32_t set_id) {
     /**
      * Manages the data structure, if the first acceess to (l,i) happens, a new
      * block is entered in the dict with the overhead of counting all the distinct
@@ -205,11 +204,12 @@ int32_t ReuseDistanceAnalyzer::block(int32_t level, int32_t i, int32_t set_id) {
 
         } else {
             // TODO fix types
-            unsigned int lower_bound = pow(block_size, level) * i;
-            unsigned int upper_bound = pow(block_size, level) * (i + 1);
+            uint32_t lower_bound = pow(block_size, level) * i;
+            uint32_t upper_bound = pow(block_size, level) * (i + 1);
             upper_bound = upper_bound < (*trace).at(set_id).size() ? upper_bound : (*trace).at(set_id).size();
-            int num_elements = 0;
-            for (unsigned int j = lower_bound; j < upper_bound; ++j) {
+            int32_t num_elements = 0;
+
+            for (uint32_t j = lower_bound; j < upper_bound; ++j) {
                 if ((*trace).at(set_id)[j] >= 0) {
                     ++num_elements;
                 }
