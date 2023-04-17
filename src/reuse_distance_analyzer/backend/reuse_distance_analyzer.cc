@@ -1,13 +1,12 @@
+#include "reuse_distance_analyzer.h"
+
+#include <iostream>
 #include <span>
 #include <unordered_set>
-#include <iostream>
-
-#include "reuse_distance_analyzer.h"
 
 #define COMPULSORY_MISS -1
 
-ReuseDistanceAnalyzer::ReuseDistanceAnalyzer() {
-}
+ReuseDistanceAnalyzer::ReuseDistanceAnalyzer() {}
 
 int32_t ReuseDistanceAnalyzer::process_load(address_t address) { return this->process_access(address); }
 
@@ -15,13 +14,28 @@ int32_t ReuseDistanceAnalyzer::process_store(address_t address) { return this->p
 
 std::unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::get_reuse_distance_counts() { return reuse_distance_counts; }
 
+void ReuseDistanceAnalyzer::shorten_addresses() {
+    std::vector<int32_t> values;
+
+    for (auto& kv : this->last_access_num_of_address) {
+        values.push_back(kv.second);
+    }
+
+    auto first_index_to_keep = *std::min_element(values.begin(), values.end()) - 1;
+
+    auto begin = this->addresses.begin();
+
+    this->addresses.erase(begin, begin + (first_index_to_keep - this->addresses_offset));
+    this->addresses_offset = first_index_to_keep;
+}
+
 int32_t ReuseDistanceAnalyzer::process_access(address_t address) {
     this->access_num += 1;
 
     int32_t reuse_distance = COMPULSORY_MISS;
 
     // check if address was accessed before
-    if(this->last_access_num_of_address.contains(address)) {
+    if (this->last_access_num_of_address.contains(address)) {
         auto last_access = this->last_access_num_of_address[address];
         size_t start_index = last_access - this->addresses_offset;
 
@@ -30,7 +44,7 @@ int32_t ReuseDistanceAnalyzer::process_access(address_t address) {
 
         std::unordered_set<address_t> unique_addresses;
 
-        for(auto it = start; it != stop; ++it) {
+        for (auto it = start; it != stop; ++it) {
             unique_addresses.insert(*it);
         }
 
@@ -41,11 +55,13 @@ int32_t ReuseDistanceAnalyzer::process_access(address_t address) {
 
     this->addresses.push_back(address);
 
-    if(!this->reuse_distance_counts.contains(reuse_distance)) {
+    if (!this->reuse_distance_counts.contains(reuse_distance)) {
         this->reuse_distance_counts[reuse_distance] = 1;
     } else {
         this->reuse_distance_counts[reuse_distance] += 1;
     }
+
+    this->shorten_addresses();
 
     return reuse_distance;
 }

@@ -13,5 +13,4 @@ PYBIND11_MODULE(pybind_reuse_distance_analyzer, m) {
         .def("process_load", &ReuseDistanceAnalyzer::process_load)
         .def("process_store", &ReuseDistanceAnalyzer::process_store)
         .def("get_reuse_distance_counts", &ReuseDistanceAnalyzer::get_reuse_distance_counts);
-        
 }

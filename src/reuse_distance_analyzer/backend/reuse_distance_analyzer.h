@@ -26,6 +26,7 @@ private:
     std::unordered_map<int32_t, int32_t> reuse_distance_counts;
 
     int32_t process_access(address_t address);
+    void shorten_addresses();
 };
 
 #endif  // REUSE_DISTANCE_ANALYZER_H

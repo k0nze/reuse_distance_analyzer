@@ -1,12 +1,10 @@
+#include <cassert>
 #include <iostream>
 #include <vector>
-#include <cassert>
 
 #include "reuse_distance_analyzer.h"
 
 int main() {
-    std::cout << "Reuse Distance Analyzer" << std::endl;
-
     ReuseDistanceAnalyzer rda = ReuseDistanceAnalyzer();
 
     rda.process_load(1);
