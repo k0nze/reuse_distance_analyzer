@@ -13,5 +13,10 @@ int32_t ReuseDistanceAnalyzer::process_store(address_t address) { return this->p
 //unordered_map<int32_t, int32_t> ReuseDistanceAnalyzer::get_reuse_distance_counts() { return *reuse_distance_counts; }
 
 int32_t ReuseDistanceAnalyzer::process_access(address_t address) {
+    this->access_num += 1;
 
+    int32_t reuse_distance = COMPULSORY_MISS;
+
+    // check if address was accessed before
+    return reuse_distance;
 }
