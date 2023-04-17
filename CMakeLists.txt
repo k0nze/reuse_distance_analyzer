@@ -4,7 +4,7 @@ project(reuse_dist_analyzer)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(BACKEND_SOURCE_DIR ${PROJECT_SOURCE_DIR}/reuse_distance_analyzer/backend)
+set(BACKEND_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src/backend)
 
 set(MOVE_LIB
     "ON"
@@ -37,7 +37,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 endif()
 
 add_library(reuse_distance_analyzer SHARED
-            reuse_distance_analyzer/backend/reuse_distance_analyzer.cc)
+            ${BACKEND_SOURCE_DIR}/reuse_distance_analyzer.cc)
 
 target_compile_options(reuse_distance_analyzer INTERFACE "-fsized-deallocation")
 

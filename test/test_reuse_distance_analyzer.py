@@ -25,6 +25,8 @@ class TestReuseDistanceAnalyzer(unittest.TestCase):
         self.assertIn(3, reuse_distance_counts.keys())
         self.assertEqual(reuse_distance_counts[3], 4)
 
+        # those access are not distinct, therefore the next access of 3 must
+        # have a reuse distance of 1
         rda.process_store(4)
         rda.process_store(4)
         rda.process_store(4)
@@ -35,12 +37,20 @@ class TestReuseDistanceAnalyzer(unittest.TestCase):
 
         reuse_distance_counts = rda.get_reuse_distance_counts()
 
-        # rda.process_load(2)
-        # rda.process_load(1)
+        self.assertIn(0, reuse_distance_counts.keys())
+        self.assertEqual(reuse_distance_counts[0], 5)
+        self.assertIn(1, reuse_distance_counts.keys())
+        self.assertEqual(reuse_distance_counts[1], 1)
 
-        # self.assertIn(0, reuse_distance_counts.keys())
+        # there are only two distinct accesses between this access of 2 and the
+        # next
+        rda.process_load(2)
+        # there are only three distinct accesses between this access of 2 and
+        # the next
+        rda.process_load(1)
 
-        # self.assertEqual(reuse_distance_counts[-1], 4)
-
-        for reuse_distance, count in rda.get_reuse_distance_counts().items():
-            print(f"{reuse_distance}\t{count}")
+        reuse_distance_counts = rda.get_reuse_distance_counts()
+        self.assertIn(2, reuse_distance_counts.keys())
+        self.assertEqual(reuse_distance_counts[2], 1)
+        self.assertIn(3, reuse_distance_counts.keys())
+        self.assertEqual(reuse_distance_counts[3], 5)

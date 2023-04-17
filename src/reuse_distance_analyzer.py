@@ -33,6 +33,7 @@ class ReuseDistanceAnalyzer:
             self.reuse_distance_counts[reuse_distance] = 1
         else:
             self.reuse_distance_counts[reuse_distance] += 1
+
         return reuse_distance
 
     def get_reuse_distance_counts(self) -> Dict[int, int]:
