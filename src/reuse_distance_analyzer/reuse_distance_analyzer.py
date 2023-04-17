@@ -17,8 +17,11 @@ class ReuseDistanceAnalyzer:
 
     def _shorten_addresses(self):
         # find first index that has to stay in addresses
-        # print(self.last_access_num_of_address.values())
-        pass
+        first_index_to_keep = min(self.last_access_num_of_address.values()) - 1
+
+        # remove addresses that are no longer needed for reuse distance calculation
+        self.addresses = self.addresses[(first_index_to_keep - self.addresses_offset) :]
+        self.addresses_offset = first_index_to_keep
 
     def process_access(self, address: int) -> int:
 
@@ -29,7 +32,9 @@ class ReuseDistanceAnalyzer:
         # check if address was accessed before
         if address in self.last_access_num_of_address.keys():
             last_access = self.last_access_num_of_address[address]
-            reuse_distance = len(set(self.addresses[last_access:]))
+            reuse_distance = len(
+                set(self.addresses[(last_access - self.addresses_offset) :])
+            )
 
         self.last_access_num_of_address[address] = self.access_num
 

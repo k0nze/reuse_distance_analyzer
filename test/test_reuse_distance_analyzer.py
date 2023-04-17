@@ -59,10 +59,11 @@ class TestReuseDistanceAnalyzer(unittest.TestCase):
         self.assertIn(3, reuse_distance_counts.keys())
         self.assertEqual(reuse_distance_counts[3], 5)
 
-    @unittest.skipIf(
-        "RUNTIME_BENCHMARK" in os.environ and os.environ["RUNTIME_BENCHMARK"] == "ON",
-        "$RUNTIME_BENCHMARK not set to ON",
-    )
+    # @unittest.skipIf(
+    #    "RUNTIME_BENCHMARK" in os.environ and os.environ["RUNTIME_BENCHMARK"] == "ON",
+    #    "$RUNTIME_BENCHMARK not set to ON",
+    # )
+    # @unittest.skip
     def test_random_trace_performance(self):
         rda = ReuseDistanceAnalyzer()
 
