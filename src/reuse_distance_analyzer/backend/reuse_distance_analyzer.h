@@ -14,7 +14,7 @@ public:
 
     int32_t process_store(address_t address);
 
-    //unordered_map<int32_t, int32_t> get_reuse_distance_counts();
+    std::unordered_map<int32_t, int32_t> get_reuse_distance_counts();
 
 private:
     std::vector<address_t> addresses;

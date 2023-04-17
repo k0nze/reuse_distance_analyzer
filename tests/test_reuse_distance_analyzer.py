@@ -54,6 +54,7 @@ class TestReuseDistanceAnalyzer(unittest.TestCase):
         rda.process_load(1)
 
         reuse_distance_counts = rda.get_reuse_distance_counts()
+        
         self.assertIn(2, reuse_distance_counts.keys())
         self.assertEqual(reuse_distance_counts[2], 1)
         self.assertIn(3, reuse_distance_counts.keys())
