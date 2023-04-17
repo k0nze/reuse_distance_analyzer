@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/external/pybind11/include/",
-                "${workspaceFolder}/reuse_distance_analyzer/backend",
+                "${workspaceFolder}/src/reuse_distance_analyzer/backend",
                 "/usr/include/python3.9/"
             ],
             "defines": [],

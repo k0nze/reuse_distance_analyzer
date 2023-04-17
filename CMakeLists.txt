@@ -48,7 +48,7 @@ if(MOVE_LIB)
                                            ${BACKEND_SOURCE_DIR})
 endif()
 
-add_executable(test_cpp test/cpp/main.cc)
+add_executable(test_cpp tests/cpp/main.cc)
 target_include_directories(test_cpp PRIVATE ${BACKEND_SOURCE_DIR})
 target_link_libraries(test_cpp reuse_distance_analyzer)
 

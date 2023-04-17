@@ -4,7 +4,7 @@
 
 int main() {
     std::cout << "Reuse Distance Analyzer" << std::endl;
-    ReuseDistanceAnalyzer ra = ReuseDistanceAnalyzer(16, 4, 2);
+    ReuseDistanceAnalyzer ra = ReuseDistanceAnalyzer();
 
     ra.process_load(1);
     ra.process_load(2);
@@ -18,10 +18,11 @@ int main() {
     ra.process_load(64);
     ra.process_store(16);
     ra.process_load(32);
-
+/* 
     auto counts = ra.get_reuse_distance_counts();
 
     for (auto& kv : counts) {
         std::cout << kv.first << ", " << kv.second << std::endl;
     }
+*/
 }
