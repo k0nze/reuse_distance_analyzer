@@ -42,13 +42,9 @@ int32_t ReuseDistanceAnalyzer::process_access(address_t address) {
         std::vector<address_t>::iterator start = this->addresses.begin() + start_index;
         std::vector<address_t>::iterator stop = this->addresses.end();
 
-        std::unordered_set<address_t> unique_addresses;
-
-        for (auto it = start; it != stop; ++it) {
-            unique_addresses.insert(*it);
-        }
-
-        reuse_distance = unique_addresses.size();
+        std::vector<address_t> range(start, stop);
+        std::sort(range.begin(), range.end());
+        reuse_distance = std::unique(range.begin(), range.end()) - range.begin();
     }
 
     this->last_access_num_of_address[address] = this->access_num;
@@ -61,7 +57,7 @@ int32_t ReuseDistanceAnalyzer::process_access(address_t address) {
         this->reuse_distance_counts[reuse_distance] += 1;
     }
 
-    this->shorten_addresses();
+    // this->shorten_addresses();
 
     return reuse_distance;
 }

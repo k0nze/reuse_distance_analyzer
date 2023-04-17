@@ -7,7 +7,6 @@ from src.reuse_distance_analyzer import ReuseDistanceAnalyzer
 
 
 class TestReuseDistanceAnalyzer(unittest.TestCase):
-    @unittest.skip
     def test_reuse_distance_counts(self):
         # setting all cache parameters 1 results in the literature defined and cache parameter independent reuse distance
         # rda = ReuseDistanceAnalyzer(sets=1, ways=1, cache_line_size=1, block_size=32)
@@ -70,7 +69,7 @@ class TestReuseDistanceAnalyzer(unittest.TestCase):
 
         lower_address = 0x1000
         upper_address = 0x2000
-        num_addresses = 10_000
+        num_addresses = 100_000
 
         num_runs = 5
         runtimes = []
