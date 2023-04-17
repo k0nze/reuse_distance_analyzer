@@ -54,7 +54,7 @@ class TestReuseDistanceAnalyzer(unittest.TestCase):
         rda.process_load(1)
 
         reuse_distance_counts = rda.get_reuse_distance_counts()
-        
+
         self.assertIn(2, reuse_distance_counts.keys())
         self.assertEqual(reuse_distance_counts[2], 1)
         self.assertIn(3, reuse_distance_counts.keys())
@@ -64,7 +64,7 @@ class TestReuseDistanceAnalyzer(unittest.TestCase):
     #    "RUNTIME_BENCHMARK" in os.environ and os.environ["RUNTIME_BENCHMARK"] == "ON",
     #    "$RUNTIME_BENCHMARK not set to ON",
     # )
-    # @unittest.skip
+    #@unittest.skip
     def test_random_trace_performance(self):
         rda = ReuseDistanceAnalyzer()
 
@@ -80,7 +80,7 @@ class TestReuseDistanceAnalyzer(unittest.TestCase):
 
             for _ in range(num_addresses):
                 address = random.randint(lower_address, upper_address)
-                rda.process_access(address)
+                rda.process_load(address)
 
             end_time = timeit.default_timer()
             runtime = end_time - start_time
