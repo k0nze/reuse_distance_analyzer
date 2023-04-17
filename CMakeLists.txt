@@ -4,11 +4,15 @@ project(reuse_dist_analyzer)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(BACKEND_DIR_PATH ${PROJECT_SOURCE_DIR}/reuse_distance_analyzer/backend)
+set(BACKEND_SOURCE_DIR ${PROJECT_SOURCE_DIR}/reuse_distance_analyzer/backend)
 
 set(MOVE_LIB
     "ON"
-    CACHE STRING "move TODO")
+    CACHE STRING "move libreuse_distance_analyzer.so into backend directory")
+
+set(MOVE_CPYTHON_SO
+    "ON"
+    CACHE STRING "move cpython.so into backend directory")
 
 # globally enable -fPIC
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -35,12 +39,29 @@ endif()
 add_library(reuse_distance_analyzer SHARED
             reuse_distance_analyzer/backend/reuse_distance_analyzer.cc)
 
+target_compile_options(reuse_distance_analyzer INTERFACE "-fsized-deallocation")
+
 if(MOVE_LIB)
     set_target_properties(
         reuse_distance_analyzer PROPERTIES LIBRARY_OUTPUT_DIRECTORY
-                                           ${BACKEND_DIR_PATH})
+                                           ${BACKEND_SOURCE_DIR})
 endif()
 
 add_executable(tests_cpp tests/cpp/main.cc)
-target_include_directories(tests_cpp PRIVATE ${BACKEND_DIR_PATH})
+target_include_directories(tests_cpp PRIVATE ${BACKEND_SOURCE_DIR})
 target_link_libraries(tests_cpp reuse_distance_analyzer)
+
+add_subdirectory(external/pybind11)
+
+pybind11_add_module(pybind_reuse_distance_analyzer
+                    ${BACKEND_SOURCE_DIR}/reuse_distance_analyzer_wrapper.cc)
+
+# don't show deprecation warnings for libpython
+target_compile_options(pybind_reuse_distance_analyzer
+                       PRIVATE "-Wno-deprecated-declarations")
+
+if(MOVE_CPYTHON_SO)
+    set_target_properties(
+        pybind_reuse_distance_analyzer PROPERTIES LIBRARY_OUTPUT_DIRECTORY
+                                                  ${BACKEND_SOURCE_DIR})
+endif()
