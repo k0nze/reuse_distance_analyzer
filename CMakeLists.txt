@@ -59,6 +59,8 @@ pybind11_add_module(pybind_reuse_distance_analyzer
 # don't show deprecation warnings for libpython
 target_compile_options(pybind_reuse_distance_analyzer
                        PRIVATE "-Wno-deprecated-declarations")
+target_link_libraries(pybind_reuse_distance_analyzer
+                      PRIVATE reuse_distance_analyzer)
 
 if(MOVE_CPYTHON_SO)
     set_target_properties(

@@ -5,7 +5,9 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(reuse_distance_analyzer, m) {
+PYBIND11_MODULE(pybind_reuse_distance_analyzer, m) {
+    m.doc() = "Python Bindings for the C++ implementation of the ReuseDistanceAnalyzer";
+
     py::class_<ReuseDistanceAnalyzer>(m, "ReuseDistanceAnalyzer")
         .def(py::init<uint32_t, uint32_t, uint32_t, u_int32_t>(), py::arg("sets"), py::arg("ways"), py::arg("cache_line_size"),
              py::arg("block_size"));

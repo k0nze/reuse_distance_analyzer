@@ -1,3 +1,3 @@
-import reuse_distance_analyzer.backend.pybind_reuse_distance_analyzer as test
+from reuse_distance_analyzer import ReuseDistanceAnalyzer
 
-print(dir(test))
+rda = ReuseDistanceAnalyzer(4, 8, 64, 16)
