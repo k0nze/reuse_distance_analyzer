@@ -1,1 +1,2 @@
-from .backend.pybind_reuse_distance_analyzer import ReuseDistanceAnalyzer
+# from .backend.pybind_reuse_distance_analyzer import ReuseDistanceAnalyzer
+from .reuse_distance_analyzer import ReuseDistanceAnalyzer
