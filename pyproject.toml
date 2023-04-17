@@ -8,7 +8,8 @@ version = "1.0.0"
 description = "{}"
 readme = "README.md"
 authors = [
-    { name = "{Felix Wedlich}", email = "{Felix.Wedlich@gmail.com}" }
+    { name = "{Felix Wedlich}", email = "{Felix.Wedlich@gmail.com}" },
+    { name = "{Konstantin (Konze) Lübeck}", email = "{konstantin.luebeck@uni-tuebingen.de}" }
 ]
 license = { file = "LICENSE" }
 
@@ -26,10 +27,10 @@ dependencies = [
 requires-python = ">=3.9"
 
 [project.optional-dependencies]
-dev = ["yapf", "bumpver", "isort", "pip-tools", "unittest", "pre-commit"]
+dev = ["black", "bumpver", "isort", "pip-tools", "unittest", "pre-commit"]
 
-#[project.urls]
-#Homepage = ""
+[project.urls]
+Homepage = "https://github.com/k0nze/reuse_distance_analyzer"
 
 [tool.bumpver]
 current_version = "1.0.0"
@@ -40,7 +41,7 @@ tag = true
 push = true
 
 [tool.bumpver.file_patterns]
-"src/reusedist/__init__.py" = ['__version__ = "{version}"',]
+"src/reuse_distance_analyzer/__init__.py" = ['__version__ = "{version}"',]
 "pyproject.toml" = ['current_version = "{version}"',]
 
 [tool.yapf]
