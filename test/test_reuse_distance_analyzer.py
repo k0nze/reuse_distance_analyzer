@@ -1,5 +1,5 @@
 import unittest
-from reuse_distance_analyzer import ReuseDistanceAnalyzer
+from src.reuse_distance_analyzer import ReuseDistanceAnalyzer
 
 
 class TestReuseDistanceAnalyzer(unittest.TestCase):
